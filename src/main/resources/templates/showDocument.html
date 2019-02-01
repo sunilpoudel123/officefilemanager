@@ -14,8 +14,32 @@
 </br>
 </br>
 <!-------------------------------->
+<div class="container" align="center">
+    <h3>List of Documents:</h3>
 
+    <table class="table table-hover">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Document ID</th>
+            <th scope="col">Document Name</th>
+            <th scope="col">Document Type</th>
+            <th scope="col">Download</th>
+            <th scope="col">Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="document: ${documents}">
 
+            <th scope="row"><a th:text="${document.documentId}"></a></th>
+            <td th:text="${document.documentName}"></td>
+            <td th:text="${document.documentType}"></td>
+            <td th:text="${document.documentType}"></td>
+            <td th:text="${document.documentType}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
 <div th:replace="fragments/footer :: footer"></div>
 </body>
 </html>

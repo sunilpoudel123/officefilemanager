@@ -1,12 +1,14 @@
 package com.sdev.officefilemanager.web;
 
+import com.sdev.officefilemanager.data.DocumentRepository;
 import com.sdev.officefilemanager.domain.Document;
+import com.sdev.officefilemanager.service.DocumentStorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +16,14 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/")
 public class DocumentController {
+
+    private DocumentRepository repository;
+    private DocumentStorageService service;
+    @Autowired
+    public DocumentController(DocumentRepository repository, DocumentStorageService service){
+        this.repository = repository;
+        this.service= service;
+    }
 
     @ModelAttribute(value = "document")
     public Document newDocument()
@@ -34,15 +44,19 @@ public class DocumentController {
     }
 
     @PostMapping(value ="/upload/add")
-    public String submitForm(Document document){
+    public String submitForm(@RequestParam("file") MultipartFile file, @ModelAttribute Document document, ModelMap modelMap){
 
-
+        this.repository.save(document.toDocumentData());
+        service.store(file, document.getDocumentType());
         return "uploadDocument";
     }
 
     @GetMapping("showdocument")
-    public String displayAllDocument(){
-
+    public String displayAllDocument(ModelMap modelMap){
+        Iterable<Document> documents= this.repository.findAll();
+        modelMap.addAttribute("documents", documents);
         return "showDocument";
     }
+
+
 }

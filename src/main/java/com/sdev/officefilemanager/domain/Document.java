@@ -18,7 +18,7 @@ public class Document {
     private Type documentType;
 
     public enum Type {
-        pdf,jpeg,doc,others
+        others,pdf,image,doc
     }
 
     public int getDocumentId() {
@@ -44,4 +44,14 @@ public class Document {
     public void setDocumentType(Type documentType) {
         this.documentType = documentType;
     }
+
+    public Document toDocumentData(){
+        Document document= new Document();
+        document.setDocumentId(this.documentId);
+        document.setDocumentName(this.documentName);
+        document.setDocumentType(this.documentType);
+        return document;
+    }
+
+
 }
