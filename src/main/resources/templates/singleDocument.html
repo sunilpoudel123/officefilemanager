@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+    <script src="/static/js/javascript.js"></script>
+    <title>Show Document</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+</br>
+</br>
+</br>
+<!-------------------------------->
+<div class="container" align="center">
+    <h3>You Document Information:</h3>
+    <div th:if="${idDeleteMessage}" class="alert alert-danger"
+         role="alert" th:text=${idDeleteMessage}></div>
+
+    <div class="card" style="width:500px">
+        <h4 class="card-title"><a th:text=${filetype}></a></h4>
+        <img class="card-img-top" id="icon" src="/images/othersicon.png" alt="File" style="width:40%">
+        <div class="card-body">
+            <table cellspacing=12>
+                <tbody>
+                <tr th:each="document : ${documentData}">
+                    <th>ID: </th>
+                    <td><span th:text="${document.documentId}"></span></td>
+                </tr>
+                <tr th:each="document : ${documentData}">
+                    <th>Name: </th>
+                    <td><span th:text="${document.documentName}"></span></td>
+                    <a th:href="@{'/download/'+ ${document.documentId}}" class="btn btn-primary">Download</a>
+                    <a th:href="@{'/delete/'+ ${document.documentId}}" class="btn btn-danger">Delete</a>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

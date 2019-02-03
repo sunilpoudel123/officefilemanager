@@ -1,6 +1,7 @@
 package com.sdev.officefilemanager.service;
 
 import com.sdev.officefilemanager.domain.Document;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -44,17 +45,8 @@ public class DocumentStorageService implements StorageService{
                 improvedPath = Paths.get(documentLocation.toString()+"/others");
                 break;
         }
-        return improvedPath;
-    }
 
-    @Override
-    public void init() {
-        try{
-            Files.createDirectories(documentLocation);
-        }
-        catch (IOException e){
-            throw new InternalError("could not create folder",e);
-        }
+        return improvedPath;
     }
 
     @Override
@@ -66,6 +58,8 @@ public class DocumentStorageService implements StorageService{
             }
             try(InputStream stream= file.getInputStream()){
                 Files.copy(stream,this.getLocation(type).resolve(filename));
+
+
             }
         }
         catch (IOException e){
@@ -75,11 +69,23 @@ public class DocumentStorageService implements StorageService{
 
     @Override
     public Path load(String filename) {
-        return null;
+            return null;
     }
 
     @Override
     public void deleteAll() {
+
+    }
+
+    @Override
+    public void deleteById(Long id) {
+
+
+    }
+
+    @Override
+    public void downloadFileById(Long id) {
+
 
     }
 }

@@ -9,7 +9,7 @@ public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name="DOCUMENTID")
-    private int documentId;
+    private Long documentId;
 
     @Column(name="DOCUMENTNAME")
     private String documentName;
@@ -21,11 +21,23 @@ public class Document {
         others,pdf,image,doc
     }
 
-    public int getDocumentId() {
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL,
+            mappedBy = "documentfileid")
+    private FileModel fileModel;
+
+    public FileModel getFileModel() {
+        return fileModel;
+    }
+
+    public void setFileModel(FileModel fileModel) {
+        this.fileModel = fileModel;
+    }
+    public Long getDocumentId() {
         return documentId;
     }
 
-    public void setDocumentId(int documentId) {
+    public void setDocumentId(Long documentId) {
         this.documentId = documentId;
     }
 
