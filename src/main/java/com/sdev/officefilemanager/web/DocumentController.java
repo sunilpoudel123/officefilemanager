@@ -6,6 +6,9 @@ import com.sdev.officefilemanager.domain.Document;
 import com.sdev.officefilemanager.domain.FileModel;
 import com.sdev.officefilemanager.service.DocumentStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -14,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,15 +28,17 @@ import java.util.Optional;
 @RequestMapping(value = "/")
 public class DocumentController {
 
-    private DocumentRepository repository;
-    private DocumentStorageService service;
+
+    private DocumentRepository documentRepository;
+    private DocumentStorageService storageService;
     private FileRepository fileRepository;
     private FileModel filedata;
+    Document document;
 
     @Autowired
     public DocumentController(DocumentRepository repository, DocumentStorageService service, FileRepository fileRepository ){
-        this.repository = repository;
-        this.service= service;
+        this.documentRepository = repository;
+        this.storageService = service;
         this.fileRepository= fileRepository;
     }
 
@@ -57,33 +65,36 @@ public class DocumentController {
 
         Document savedDocumentData= document.toDocumentData();
 
-        service.store(file, document.getDocumentType());
-        String savedfilename= String.valueOf(service.getLocation(document.getDocumentType()));
-        String savedFileLocationName= StringUtils.cleanPath(file.getOriginalFilename());
+        storageService.store(file, document);
+        String savedfilename= storageService.getFileName(StringUtils.cleanPath(file.getOriginalFilename()),savedDocumentData.getDocumentName());
+        String savedFileLocationName= String.valueOf(storageService.getLocation(document));
 
         filedata = new FileModel(savedfilename,savedFileLocationName);
         savedDocumentData.setFileModel(filedata);
         filedata.setDocumentfileid(savedDocumentData);
-        this.repository.save(savedDocumentData);
+        this.documentRepository.save(savedDocumentData);
 
-        modelAndView.addObject("fileUploadMessage", "Your file Uploaded Successfully");
+        modelAndView.addObject("fileUploadMessage", "Your '"+file.getOriginalFilename() + "' file Uploaded Successfully");
         modelAndView.setViewName("uploadDocument");
         return modelAndView;
     }
 
     @GetMapping("showdocument")
     public String displayAllDocument(ModelMap modelMap){
-        Iterable<Document> documents= this.repository.findAll();
+        Iterable<Document> documents= this.documentRepository.findAll();
         modelMap.addAttribute("documents", documents);
         return "showDocument";
     }
 
     @GetMapping("delete/{id}")
     public ModelAndView deleteDocumentById(@PathVariable Long id, ModelAndView modelAndView){
-        String deleteIdName= this.repository.findDocumentByDocumentId(id).getDocumentName();
-        this.repository.deleteById(id);
+        String deleteIdName= this.documentRepository.findDocumentByDocumentId(id).getDocumentName();
+        Optional<FileModel> fileModel= this.fileRepository.findById(id);
+        Optional<Document> loadNewDocumentData= this.documentRepository.findById(id);
+        this.documentRepository.deleteById(id);
+        storageService.deleteFileById(fileModel.get().getFileName(),loadNewDocumentData.get());
         modelAndView.addObject("idDeleteMessage", deleteIdName +" deleted successfully");
-        Iterable<Document> documents= this.repository.findAll();
+        Iterable<Document> documents= this.documentRepository.findAll();
         modelAndView.addObject("documents", documents);
         modelAndView.setViewName("showDocument");
         return modelAndView;
@@ -94,18 +105,33 @@ public class DocumentController {
     @GetMapping("showdocument/{id}")
     public ModelAndView showFileDataById(@PathVariable Long id, ModelAndView modelAndView){
 
-        Optional<Document> documentData= this.repository.findById(id);
+        Optional<Document> documentData= this.documentRepository.findById(id);
         modelAndView.addObject("filetype", documentData.get().getDocumentType());
         modelAndView.addObject("documentData",documentData.get());
         modelAndView.setViewName("singleDocument");
         return modelAndView;
     }
 
+
     @GetMapping("download/{id}")
-    public ModelAndView downloadFileById(@PathVariable Long id, ModelAndView modelAndView){
-        this.fileRepository.findById(id);
+    public  ModelAndView prepareForDownloadFile(@PathVariable Long id, ModelAndView modelAndView) throws IOException {
+
+        Optional<FileModel> fileModel= this.fileRepository.findById(id);
+        Optional<Document> documentDataLoad = this.documentRepository.findById(id);
+        document= documentDataLoad.get();
+        Path path = Paths.get(fileModel.get().getFileName());
+        modelAndView.addObject("entity", path);
+        modelAndView.setViewName("downloadDocument");
         return modelAndView;
     }
 
+    @GetMapping("/files/{filename:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> beginDownloadFile(@PathVariable String filename) {
+
+        Resource file = storageService.loadAsResource(filename,document );
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    }
 
 }

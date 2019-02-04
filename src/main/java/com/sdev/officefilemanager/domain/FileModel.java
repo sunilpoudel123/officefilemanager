@@ -8,7 +8,7 @@ import javax.persistence.*;
 public class FileModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="FILEID")
     private Long FileId;
 

@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Document {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="DOCUMENTID")
     private Long documentId;
 
@@ -62,6 +62,13 @@ public class Document {
         document.setDocumentId(this.documentId);
         document.setDocumentName(this.documentName);
         document.setDocumentType(this.documentType);
+        return document;
+    }
+    public Document dummyDocumentData(){
+        Document document= new Document();
+        document.setDocumentId((long)1);
+        document.setDocumentName("test");
+        document.setDocumentType(Type.others);
         return document;
     }
 

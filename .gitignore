@@ -23,4 +23,7 @@
 /nbdist/
 /.nb-gradle/
 /build/
-/document/
+/document/doc/
+/document/image/
+/document/others/
+/document/pdf/

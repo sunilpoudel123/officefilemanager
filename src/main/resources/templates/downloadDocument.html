@@ -22,24 +22,9 @@
          role="alert" th:text=${idDeleteMessage}></div>
 
     <div class="card" style="width:500px">
-        <h4 class="card-title"><a th:text=${filetype}></a></h4>
+        <h4 class="card-title"><a th:href="@{${'/files/' +entity}}">Download</a></h4>
         <img class="card-img-top" id="icon" src="/images/othersicon.png" alt="File" style="width:40%">
         <div class="card-body">
-            <table cellspacing=12>
-                <tbody>
-                <tr th:each="document : ${documentData}">
-                    <th>ID: </th>
-                    <td><span th:text="${document.documentId}"></span></td>
-                </tr>
-                <tr th:each="document : ${documentData}">
-                    <th>Name: </th>
-                    <td><span th:text="${document.documentName}"></span></td>
-                    <a th:href="@{'/download/'+ ${document.documentId}}" class="btn btn-primary">Proceed to Download</a>
-
-                    <a th:href="@{'/delete/'+ ${document.documentId}}" class="btn btn-danger">Delete</a>
-                </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 

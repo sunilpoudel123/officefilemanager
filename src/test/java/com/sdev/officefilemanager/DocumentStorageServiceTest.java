@@ -6,6 +6,9 @@ import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import static org.junit.Assert.*;
 
 /**
@@ -18,9 +21,11 @@ import static org.junit.Assert.*;
 public class DocumentStorageServiceTest {
 
     DocumentStorageService storageService;
+    Document document= new Document();
     @Before
     public void before() throws Exception {
         storageService= new DocumentStorageService();
+        document= document.dummyDocumentData();
     }
 
     @After
@@ -29,18 +34,16 @@ public class DocumentStorageServiceTest {
 
     @Test
     public void getCorrectFileName(){
-        assertEquals("scr-2019-02.jpg",storageService.getFileName("screenshot.jpg"));
-        assertEquals("rep-2019-02.pdf",storageService.getFileName("report.pdf"));
-        assertEquals("res-2019-02.doc",storageService.getFileName("result.doc"));
-        assertEquals("son-2019-02.mp3",storageService.getFileName("song.mp3"));
+        String timeStamp = new SimpleDateFormat("-yyyy-MM-dd-hh-mm").format(new Date());
+        assertEquals("screen-scr"+timeStamp+".jpg",storageService.getFileName("screenshot.jpg","screen"));
+        assertEquals("officereport-rep"+timeStamp+".pdf",storageService.getFileName("report.pdf","officereport"));
+        assertEquals("document-res"+timeStamp+".doc",storageService.getFileName("result.doc", "document"));
+        assertEquals("moviesong-son"+timeStamp+".mp3",storageService.getFileName("song.mp3","moviesong"));
     }
 
     @Test
     public void getCorrectLocationToStoreFile(){
-        assertEquals("document/doc",storageService.getLocation(Document.Type.doc).toString());
-        assertEquals("document/pdf",storageService.getLocation(Document.Type.pdf).toString());
-        assertEquals("document/others",storageService.getLocation(Document.Type.others).toString());
-        assertEquals("document/image",storageService.getLocation(Document.Type.image).toString());
+        assertEquals("document/others",storageService.getLocation(document).toString());
     }
 
-} 
+}
