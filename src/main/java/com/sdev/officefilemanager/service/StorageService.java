@@ -10,4 +10,5 @@ public interface StorageService {
     Path load(String filename, Document document);
     void deleteFileById(String fullpath, Document document);
     Resource loadAsResource(String filename, Document document);
+    void init();
 }
